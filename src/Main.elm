@@ -1,3 +1,5 @@
+
+
 port module Main exposing
     ( Model
     , Msg(..)
@@ -43,7 +45,7 @@ import Users.Detail
 import Users.New
 import Users.Users as User
 
-
+-- hi
 main =
     Browser.application
         { init = init
@@ -142,6 +144,7 @@ init _ url key =
       , route = Maybe.withDefault NotFound (P.parse routeParser url)
       , session = Session.NotSignedIn
       , timezone = Nothing
+      , permissions = Dict.empty
       , users = Dict.empty
       , user_detail = Users.Detail.init
       , user_new = Users.New.init
@@ -171,6 +174,7 @@ type Msg
     | UrlChanged Url.Url
     | GotTimezone Time.Zone
     | GotUsers (Result Http.Error (List User.User))
+    | GotPermissions (Result Http.Error (List User.Permission))
     | GotUser User.Id (Result Http.Error User.User)
     | GotTests (Result Http.Error (List Tests.List.Test))
     | GotQuestionCategories (Result Http.Error (List QuestionCategory))
@@ -256,6 +260,21 @@ update msg model =
 
         GotTimezone zone ->
             ( { model | timezone = Just zone }, Cmd.none )
+
+        GotPermissions permissions_result->
+            ( case permissions_result of
+                Ok permissions ->
+                    { model
+                        | permission =
+                            Dict.fromList
+                                (List.map (\p -> [p.id, p.permission_name], p) permissions)
+
+                    }
+
+                Err e ->
+                    model
+              , Cmd.none
+              )
 
         GotUsers users_result ->
             ( case users_result of
@@ -731,8 +750,18 @@ loadData :
 loadData session route =
     case route of
         Home ->
-            ( Cmd.none, [], [] )
-
+            (Http.request
+                {method = "GET"
+                 , headers = Nothing
+                 , url = ["api/v1/permissions/"]
+                 , body = emptyBody
+                 , expect = Http.expectJson GotPermissions User.permissionListDecoder
+                 , timeout = Nothing
+                 , tracker = Nothing
+                 }
+              , []
+              , []
+              )
         Users ->
             case idToken session of
                 Just id_token ->
@@ -948,7 +977,8 @@ viewPage model =
             TestSessions.TakeTest.view model.test_take |> Html.map TestTakeMsg
 
         Home ->
-            h1 [] [ text "Welcome to the A-Team!" ]
+            h1 [] [ text "if your reading this then chances are Nico has been playing around with home page, and his changes weren't removed" ]
+
 
         NotFound ->
             h1 [] [ text "Page not found!" ]

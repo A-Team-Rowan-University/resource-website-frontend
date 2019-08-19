@@ -8,6 +8,7 @@ module Users.Users exposing
     , permissionAddUrl
     , permissionSearchUrl
     , permissionUrl
+    , permissionListDecoder
     , singleUrl
     , userPermissionListDecoder
     , view
@@ -250,6 +251,10 @@ permissionDecoder =
     D.map2 Permission
         (D.field "id" D.int)
         (D.field "permission_name" D.string)
+
+permissionListDecoder : D.Decoder (List Permission)
+permissionListDecoder =
+    D.field "entries" (D.list permissionDecoder)
 
 
 userPermissionDecoder : D.Decoder Int
