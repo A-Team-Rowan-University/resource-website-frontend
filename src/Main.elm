@@ -1,5 +1,3 @@
-
-
 port module Main exposing
     ( Model
     , Msg(..)
@@ -45,7 +43,6 @@ import Users.Detail
 import Users.New
 import Users.Users as User
 
--- hi
 main =
     Browser.application
         { init = init
