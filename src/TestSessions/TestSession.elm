@@ -215,7 +215,16 @@ viewRegistration timezone users registration =
             , div [ class "column" ]
                 [ text
                     (Maybe.withDefault "--"
-                        (Maybe.map String.fromFloat registration.score)
+                        (case registration.score of
+                            Nothing ->
+                                Nothing
+
+                            Just score ->
+                                Maybe.Just
+                                    String.fromFloat
+                                    (toFloat (round (score * 10000.0)) / 100.0)
+                                    ++ "%"
+                        )
                     )
                 ]
             ]
