@@ -221,9 +221,10 @@ viewRegistration timezone users registration =
 
                             Just score ->
                                 Maybe.Just
-                                    String.fromFloat
-                                    (toFloat (round (score * 10000.0)) / 100.0)
-                                    ++ "%"
+                                    (String.fromFloat
+                                        (toFloat (round (score * 10000.0)) / 100.0)
+                                        ++ "%"
+                                    )
                         )
                     )
                 ]
